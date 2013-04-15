@@ -1,0 +1,4 @@
+CTRL=True if the user is holding down the CTRL key now.
+ALT=True if the user is holding down the ALT key now.
+SHIFT=True if the user is holding down the SHIFT key now.
+KEY_<name>=True if the key with the specified LWJGL key name is down. For example KEY_A or KEY_SPACE.

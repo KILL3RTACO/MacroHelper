@@ -12,7 +12,7 @@ import com.kill3rtaco.macrohelper.options.FrameOptions;
 public class MacroHelperMenu extends JMenuBar implements ActionListener {
 
 	private static final long serialVersionUID = 7762791468896305720L;
-	private JMenuItem options;
+	private JMenuItem options, exit;
 
 	public MacroHelperMenu() {
 		JMenu main = new JMenu("MacroHelper");
@@ -20,6 +20,10 @@ public class MacroHelperMenu extends JMenuBar implements ActionListener {
 		options = new JMenuItem("Options...");
 		options.addActionListener(this);
 		main.add(options);
+		main.addSeparator();
+		exit = new JMenuItem("Exit");
+		exit.addActionListener(this);
+		main.add(exit);
 	}
 
 	@Override
@@ -27,6 +31,8 @@ public class MacroHelperMenu extends JMenuBar implements ActionListener {
 		if(event.getSource() == options){
 			FrameOptions window = new FrameOptions();
 			window.setVisible(true);
+		}else if(event.getSource() == exit){
+			System.exit(0);
 		}
 	}
 

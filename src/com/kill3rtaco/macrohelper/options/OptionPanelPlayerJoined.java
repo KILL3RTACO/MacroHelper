@@ -3,28 +3,30 @@ package com.kill3rtaco.macrohelper.options;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import com.kill3rtaco.macrohelper.MacroHelper;
+import com.kill3rtaco.macrohelper.util.PropertiesUtils;
 
 public class OptionPanelPlayerJoined extends JPanel implements ActionListener {
 
+	private JFrame parent;
 	private Properties props;
 	private JTextField djsMessage;
 	private JCheckBox logDefault;
-	private JButton saveButton;
+	private JButton saveButton, closeButton;
 	private static final long serialVersionUID = -5021009805573748042L;
 
-	public OptionPanelPlayerJoined() {
+	public OptionPanelPlayerJoined(JFrame parent) {
+		this.parent = parent;
 		try {
 			props = new Properties();
 			props.load(new FileInputStream(MacroHelper.PLAYERJOIN_PROPERTIES));
@@ -46,9 +48,13 @@ public class OptionPanelPlayerJoined extends JPanel implements ActionListener {
 		logDefault.setBounds(djsLabel.getX(), djsLabel.getY() + djsLabel.getHeight() + 5, 330, 20);
 		add(logDefault);
 		saveButton = new JButton("Save");
-		saveButton.setBounds((545 - 75) / 2, logDefault.getY() + logDefault.getHeight() + 135, 75, 25);
+		saveButton.setBounds((545 - 155) / 2, logDefault.getY() + logDefault.getHeight() + 135, 75, 25);
 		saveButton.addActionListener(this);
 		add(saveButton);
+		closeButton = new JButton("Close");
+		closeButton.setBounds(saveButton.getX() + saveButton.getWidth() + 5, saveButton.getY(), 75, 25);
+		closeButton.addActionListener(this);
+		add(closeButton);
 	}
 
 	@Override
@@ -56,13 +62,9 @@ public class OptionPanelPlayerJoined extends JPanel implements ActionListener {
 		if(event.getSource() == saveButton){
 			props.setProperty("join-string-format", djsMessage.getText());
 			props.setProperty("log-every-player", logDefault.isSelected() + "");
-			try {
-				props.store(new FileOutputStream(MacroHelper.PLAYERJOIN_PROPERTIES), "MacroHelper Options for onPlayerJoin");
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			PropertiesUtils.saveProperties(props, MacroHelper.PLAYERJOIN_PROPERTIES, "MacroHelper Options for onPlayerJoin");
+		}else if(event.getSource() == closeButton){
+			parent.setVisible(false);
 		}
 	}
 

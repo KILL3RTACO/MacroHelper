@@ -1,0 +1,12 @@
+onJoinGame=Fires when you join a game (both single player and multiplayer) and this is your general-purpose auto-exec. Since macros terminate whenever you leave a game, any long-running tasks have to be started when joining a game. Using EXEC with this event is incredibly powerful.
+onChat=Fires when a chat message is added to the display buffer (both received messages and messages added by mods trigger the event), DO NOT UNDER ANY CIRCUMSTANCES USE LOG IN THIS EVENT AS IT WILL CREATE AN INIFINTE LOOP!
+onHealthChange=Fires when your health level changes
+onFoodChange=Fires when your food level changes
+onArmourChange=Fires when your armour level changes
+onWorldChange=Fires when changing world but not when changing server (see onJoinGame for that), so useful when changing dimension or world on multiverse-enabled servers
+onModeChange=Fires when changing between creative and survival mode scrolling quickly may "skip" inventory slots and reading the inventory slot variable is recommended to figure out which slot is selected, provides a context variable called OLDINVSLOT which is the last recorded slot before it changed.
+onOxygenChange=Fires when your air level changes (this happens between entering water and beginning to drown)
+onXPChange=Fires when your XP changes
+onLevelChange=Fires when your level changes
+onItemDurabilityChange=Fires when the currently held item's durability changes,
+onWeatherChange=Fires when weather changes from raining to not raining or vice versa

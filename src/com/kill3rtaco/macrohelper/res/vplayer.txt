@@ -1,0 +1,17 @@
+PLAYER=Name of the current player - case sensitive.
+HEALTH=Player's current health amount (0 to 20 - each heart is 2 health points).
+ARMOUR=Player's current armour amount (0 to 20 - each icon is 2 armour points).
+HUNGER=Player's current hunger level (0 to 20 - each icon is 2 food points).
+XP=Player's current experience level (in current level).
+TOTALXP=Player's total current experience.
+LEVEL=Player's current level.
+MODE=Player's gamemode - 0 for survival or 1 for creative.
+INVSLOT=Current inventory slot selected (1 to 9)
+LIGHT=Light level at the current location (only valid underground)
+XPOS=Current X coordinate
+YPOS=Current Y coordinate
+ZPOS=Current Z coordinate
+DIMENSION=Current dimension: NETHER, SURFACE, END or UNKNOWN
+OXYGEN=Current air level
+ITEM=Currently wielded item ID
+DURABILITY=Currently wielded item durability

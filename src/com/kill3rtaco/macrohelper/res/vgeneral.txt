@@ -1,0 +1,3 @@
+KEYID=LWJGL key code of the key which triggered this macro.
+KEYNAME=LWJGL key name of the key which triggered the macro.
+CONFIG=Currently active configuration name (see CONFIG(name)) - case sensitive.

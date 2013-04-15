@@ -1,0 +1,17 @@
+$$?=A general parameter, use this anywhere in your macro to substitutec some text at that point.
+$$i=An item parameter, use this to prompt for an item id - the mod will provide a scrollable list of items when prompting.
+$$i'd=The same as a normal item parameter, but also sends the damage value of the selected item for mods which support this, allowing you to for example select coloured wool.
+$$f=A friend parameter, you can maintain a list of friends which can be inserted in your macros.
+$$u=An online user parameter, provides a list of online users when  executing the macro.
+$$t=The town name parameter, you can maintain a list of towns.
+$$h=The home name parameter, use this to keep a list of your homes.
+$$0-to-$$9=These are "preset text list" parameters, you can use up to 10 lists of text which can be recalled at any time and can include parameters advertisements, or other announcements.
+$$[name]=Replace "name" with any text to prompt for a named parameter, this allows a large number of possible parameters in your macros.
+$$<file.txt>=Enter the name of a text file to include the entire text file in your macro.
+$$m=Like the $$<file.txt> parameter, but prompts for the file when executing the macro.
+$$w=The warp parameter, use this for warp points.
+$$p=The "place" parameter, this stores X, Y and Z coordinates and inserts them in your macro.
+$$px=Insert the X coordinate of a "place" parameter
+$$py=Insert the Y coordinate of a "place" parameter
+$$pz=Insert the Z coordinate of a "place" parameter
+$$pn=Insert the name of a "place" parameter

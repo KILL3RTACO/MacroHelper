@@ -21,7 +21,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import com.kill3rtaco.macrohelper.MacroHelper;
-import com.kill3rtaco.macrohelper.util.PropertiesUtil;
+import com.kill3rtaco.macrohelper.util.PropertiesUtils;
 import com.kill3rtaco.macrohelper.writer.PlayerJoinWriter;
 
 public class PanelPlayerJoined extends JPanel implements ActionListener, DocumentListener, ListSelectionListener {
@@ -39,13 +39,13 @@ public class PanelPlayerJoined extends JPanel implements ActionListener, Documen
 		 try {
 			 if(!propsFile.exists())
 				 propsFile.getParentFile().mkdirs();
-				 propsFile.createNewFile();
-			 props =  PropertiesUtil.reloadProperties(propsFile);
+			 propsFile.createNewFile();
+			 props =  PropertiesUtils.reloadProperties(propsFile);
 			 if(props.getProperty("join-string-format") == null)
 			 props.setProperty("join-string-format", "&2+ &5%JOINEDPLAYER% &ejoined the game.");
 			 if(props.getProperty("log-every-player") == null)
 			 props.setProperty("log-every-player", "false");
-			 PropertiesUtil.saveProperties(props, propsFile, "MacroHelper Options for onPlayerJoined");
+			 PropertiesUtils.saveProperties(props, propsFile, "MacroHelper Options for onPlayerJoined");
 		 } catch (IOException e) {
 			 e.printStackTrace();
 		 }
@@ -56,7 +56,7 @@ public class PanelPlayerJoined extends JPanel implements ActionListener, Documen
 	private void makePanel(){
 		JPanel addPlayer = new JPanel();
 		addPlayer.setLayout(null);
-		addPlayer.setBounds(5, 5, 390, 415);
+		addPlayer.setBounds(5, 5, 425, 440);
 		addPlayer.setBorder(BorderFactory.createTitledBorder("Add player"));
 		add(addPlayer);
 		
@@ -87,7 +87,7 @@ public class PanelPlayerJoined extends JPanel implements ActionListener, Documen
 		
 		JPanel addedPlayers = new JPanel();
 		addedPlayers.setLayout(null);
-		addedPlayers.setBounds(addPlayer.getX() + addPlayer.getWidth() + 5, 5, 390, 415);
+		addedPlayers.setBounds(addPlayer.getX() + addPlayer.getWidth() + 5, 5, 425, 440);
 		addedPlayers.setBorder(BorderFactory.createTitledBorder("Players"));
 		add(addedPlayers);
 		int offset = (addedPlayers.getWidth() - nameTb.getWidth()) / 2;
@@ -95,7 +95,7 @@ public class PanelPlayerJoined extends JPanel implements ActionListener, Documen
 		playerList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		JScrollPane scrollPane = new JScrollPane(playerList);
 		scrollPane.setBounds(offset, 20, nameTb.getWidth(), addedPlayers.getHeight() - 200);
-		playerList.setBounds(offset, 20, nameTb.getWidth(), addedPlayers.getHeight() - 200);
+		playerList.setBounds(scrollPane.getBounds());
 		playerList.addListSelectionListener(this);
 		updateList();
 		addedPlayers.add(scrollPane);
@@ -145,17 +145,17 @@ public class PanelPlayerJoined extends JPanel implements ActionListener, Documen
 		if(event.getSource() == bAddPlayer || event.getSource() == nameTb || event.getSource() == messageTbLeft){
 			props.setProperty(nameTb.getText(), messageTbLeft.getText());
 			updateList();
-			PropertiesUtil.saveProperties(props, propsFile, "MacroHelper Options for onPlayerJoined");
+			PropertiesUtils.saveProperties(props, propsFile, "MacroHelper Options for onPlayerJoined");
 		}else if(event.getSource() == bDeletePlayer){
 			props.remove(playerList.getSelectedValue());
-			PropertiesUtil.saveProperties(props, propsFile, "MacroHelper Options for onPlayerJoined");
+			PropertiesUtils.saveProperties(props, propsFile, "MacroHelper Options for onPlayerJoined");
 			updateList();
 		}else if(event.getSource() == bSaveMessage){
 			bSaveMessage.setEnabled(false);
 			props.setProperty(playerList.getSelectedValue() + "", messageTbRight.getText());
-			PropertiesUtil.saveProperties(props, propsFile, "MacroHelper Options for onPlayerJoined");
+			PropertiesUtils.saveProperties(props, propsFile, "MacroHelper Options for onPlayerJoined");
 		}else if(event.getSource() == bWriteMacro){
-			props =  PropertiesUtil.reloadProperties(propsFile);
+			props =  PropertiesUtils.reloadProperties(propsFile);
 			new PlayerJoinWriter(props).write();
 			
 		}

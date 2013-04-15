@@ -1,0 +1,67 @@
+There are two types of control-flow commands available in the current scripting engine: loops and conditionals.
+
+Loops take the form of a DO LOOP, a simple loop looks like this:
+
+    DO(5);ECHO("Message");WAIT(2);LOOP
+
+Will echo "Message" 5 times with a 2 second delay. You can also specify DO without parameters to generate an infinite loop:
+
+    DO;ECHO("MESSAGE");WAIT(300);LOOP
+
+Will echo "Message" every 300 seconds forever. Use STOP(<key>) or the macro override  function to terminate active macros.
+
+Conditionals have three forms, a simple IF ENDIF:
+
+    IF(CTRL);ECHO("Control key is down");ENDIF;
+
+an IF ELSE ENDIF form:
+
+    IF(CTRL);ECHO("Control key is down");ELSE;ECHO("Control key not down");ENDIF;
+
+and an IF ELSEIF ELSE ENDIF form:
+
+    IF(CTRL);ECHO("Ctrl down");ELSEIF(ALT);ECHO("Alt down");ELSE;ECHO("Neither");ENDIF;
+
+Conditional statements can also be nested and included in loops.
+
+A "conditional echo" statement is also included, IIF which can be used as follows:
+
+    IIF(condition,"text");
+
+is functionally equivalent to:
+
+    IF(condition);ECHO("text");ENDIF;
+
+and:
+
+    IIF(condition,"text","text2");
+
+is functionally equivalent to:
+
+    IF(condition);ECHO("text");ELSE;ECHO("text2");ENDIF;
+    
+You can also combine conditionals and loops using the DO...WHILE and DO...UNTIL constructs:
+
+    DO;
+       // stuff to do
+    UNTIL(condition);
+
+or
+
+    DO;
+       // stuff to do
+    WHILE(condition);
+
+Conditional operands fall into two categories, GLOBAL variables which are in capitals and are provided by the scripting engine (a list of these is provided below), and LOCAL variables which are true/false flags stored within each macro and are always specified in lower case.
+
+Most of the standard boolean operators are supported, such as < > = != >= <= && || and can be used to compare variables to literal strings or numeric values. A simple example might be:
+
+    IF(HUNGER < 12);
+        LOG("You should eat food to stay healthy");
+    ENDIF;
+
+You can also create more complex expressions using parentheses:
+
+    IF((HUNGER < 12) && (HEALTH < 10));
+        LOG("You should REALLY eat some food to stay healthy!!");
+    ENDIF;

@@ -19,7 +19,7 @@ public class FrameOptions extends JFrame {
 		 //tabbed pane add
 		JTabbedPane tabs = new JTabbedPane();
 		add(tabs);
-		tabs.add(new OptionPanelPlayerJoined(), "onPlayerJoined");
+		tabs.add(new OptionPanelPlayerJoined(this), "onPlayerJoined");
 	}
 
 }

@@ -1,0 +1,5 @@
+TICKS=Current world ticks count (time of minecraft day).
+SEED=Current world seed
+RAIN=Current rain strength from 0 to 100
+SERVER=Current server address
+TEXTUREPACK=Currently selected texture pack name
