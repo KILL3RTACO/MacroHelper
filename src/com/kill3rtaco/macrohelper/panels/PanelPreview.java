@@ -9,7 +9,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
 
-import com.kill3rtaco.macrohelper.util.StringUtils;
+import com.kill3rtaco.util.StringUtils;
 
 public class PanelPreview extends JPanel implements ActionListener {
 

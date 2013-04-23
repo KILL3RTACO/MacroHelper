@@ -2,13 +2,11 @@ package com.kill3rtaco.macrohelper.panels;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Properties;
-import java.util.Scanner;
 
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
@@ -22,47 +20,22 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import com.kill3rtaco.macrohelper.MacroHelper;
+import com.kill3rtaco.macrohelper.config.GeneralHelpConfig;
 import com.kill3rtaco.macrohelper.util.GeneralHelpObject;
-import com.kill3rtaco.macrohelper.util.PropertiesUtils;
+import com.kill3rtaco.util.PropertiesUtils;
+import com.kill3rtaco.util.StringUtils;
 
 public class PanelGeneralHelp extends JPanel implements ActionListener {
 
-	private File propsFile;
-	private Properties props;
+	private GeneralHelpConfig config;
 	private static final long serialVersionUID = -2299522295477865156L;
-	private JRadioButton statements, controlFlow, variables, vGeneral, vInput, vPlayer, vWorld, parameters, events;
-	private JComboBox statementList, vgList, viList, vpList, vwList, parameterList, eventList;
+	private JRadioButton statements, controlFlow, variables, vGeneral, vEvent, vInput, vPlayer, vWorld, parameters, events;
+	private JComboBox statementList, vgList, veList, viList, vpList, vwList, parameterList, eventList;
 	private JTextArea helpTextArea;
 	private ButtonGroup helpGroup, vGroup;
 
 	public PanelGeneralHelp() {
-		propsFile = MacroHelper.GENERAL_HELP_PROPERTIES;
-		try {
-			if(!propsFile.exists())
-				propsFile.getParentFile().mkdirs();
-			propsFile.createNewFile();
-			props = PropertiesUtils.reloadProperties(propsFile);
-			if(props.getProperty("last-selected-choice") == null)
-				props.setProperty("last-selected-choice", "0");
-			if(props.getProperty("last-selected-var-choice") == null)
-				props.setProperty("last-selected-var-choice", "0");
-			if(props.getProperty("last-selected-event") == null)
-				props.setProperty("last-selected-event", "0");
-			if(props.getProperty("last-selected-parameter") == null)
-				props.setProperty("last-selected-parameter", "0");
-			if(props.getProperty("last-selected-statement") == null)
-				props.setProperty("last-selected-statement", "0");
-			if(props.getProperty("last-selected-var-general") == null)
-				props.setProperty("last-selected-var-general", "0");
-			if(props.getProperty("last-selected-var-input") == null)
-				props.setProperty("last-selected-var-input", "0");
-			if(props.getProperty("last-selected-var-player") == null)
-				props.setProperty("last-selected-var-player", "0");
-			if(props.getProperty("last-selected-var-world") == null)
-				props.setProperty("last-selected-var-world", "0");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		config = new GeneralHelpConfig();
 		setLayout(null);
 		makePanel();
 	}
@@ -118,13 +91,22 @@ public class PanelGeneralHelp extends JPanel implements ActionListener {
 		helpGroup.add(variables);
 		choicePanel.add(variables);
 		vGroup = new ButtonGroup();
+		vEvent = new JRadioButton("Event");
+		vEvent.setBounds(variables.getX() + 25, variables.getY() + variables.getHeight() + 5, 85, 20);
+		vEvent.addActionListener(this);
+		vGroup.add(vEvent);
+		choicePanel.add(vEvent);
+		veList = new JComboBox(getData("/vevent.txt"));
+		veList.setBounds(statementList.getX(), vEvent.getY(), statementList.getWidth(), statementList.getHeight());
+		veList.addActionListener(this);
+		choicePanel.add(veList);
 		vGeneral = new JRadioButton("General");
-		vGeneral.setBounds(variables.getX() + 25, variables.getY() + variables.getHeight() + 5, 85, 20);
+		vGeneral.setBounds(vEvent.getX(), vEvent.getY() + vEvent.getHeight() + 5, 85, 20);
 		vGeneral.addActionListener(this);
 		vGroup.add(vGeneral);
 		choicePanel.add(vGeneral);
 		vgList = new JComboBox(getData("/vgeneral.txt"));
-		vgList.setBounds(statementList.getX(), vGeneral.getY(), statementList.getWidth(), statementList.getHeight());
+		vgList.setBounds(veList.getX(), vGeneral.getY(), veList.getWidth(), veList.getHeight());
 		vgList.addActionListener(this);
 		choicePanel.add(vgList);
 		vInput = new JRadioButton("Input");
@@ -169,6 +151,7 @@ public class PanelGeneralHelp extends JPanel implements ActionListener {
 		int lastSelectedEvent = getSelectedIndex("event");
 		int lastSelectedParameter = getSelectedIndex("parameter");
 		int lastSelectedStatement = getSelectedIndex("statement");
+		int lastSelectedVarEvent = getSelectedIndex("var-event");
 		int lastSelectedVarGeneral = getSelectedIndex("var-general");
 		int lastSelectedVarInput = getSelectedIndex("var-input");
 		int lastSelectedVarPlayer = getSelectedIndex("var-player");
@@ -178,6 +161,7 @@ public class PanelGeneralHelp extends JPanel implements ActionListener {
 		eventList.setSelectedIndex(lastSelectedEvent);
 		parameterList.setSelectedIndex(lastSelectedParameter);
 		statementList.setSelectedIndex(lastSelectedStatement);
+		veList.setSelectedIndex(lastSelectedVarEvent);
 		vgList.setSelectedIndex(lastSelectedVarGeneral);
 		viList.setSelectedIndex(lastSelectedVarInput);
 		vpList.setSelectedIndex(lastSelectedVarPlayer);
@@ -187,63 +171,58 @@ public class PanelGeneralHelp extends JPanel implements ActionListener {
 	
 	private int getSelectedIndex(String key){
 		try{
-			int index = Integer.parseInt(props.getProperty("last-selected-" + key));
+			int index = Integer.parseInt(config.getProps().getProperty("last-selected-" + key));
 			if(key.equalsIgnoreCase("choice")){
 				if(index > helpGroup.getButtonCount()){
-					setSelectedIndex(key, 0);
+					config.setSelectedIndex(key, 0);
 					index = 0;
 				}
 			}else if(key.equalsIgnoreCase("var-choice")){
 				if(index > vGroup.getButtonCount()){
-					setSelectedIndex(key, 0);
+					config.setSelectedIndex(key, 0);
 					index = 0;
 				}
 			}else if(key.equalsIgnoreCase("event")){
 				if(index > eventList.getItemCount()){
-					setSelectedIndex(key, 0);
+					config.setSelectedIndex(key, 0);
 					index = 0;
 				}
 			}else if(key.equalsIgnoreCase("parameter")){
 				if(index > parameterList.getItemCount()){
-					setSelectedIndex(key, 0);
+					config.setSelectedIndex(key, 0);
 					index = 0;
 				}
 			}else if(key.equalsIgnoreCase("statement")){
 				if(index > statementList.getItemCount()){
-					setSelectedIndex(key, 0);
+					config.setSelectedIndex(key, 0);
 					index = 0;
 				}
 			}else if(key.equalsIgnoreCase("var-general")){
 				if(index > vgList.getItemCount()){
-					setSelectedIndex(key, 0);
+					config.setSelectedIndex(key, 0);
 					index = 0;
 				}
 			}else if(key.equalsIgnoreCase("var-input")){
 				if(index > viList.getItemCount()){
-					setSelectedIndex(key, 0);
+					config.setSelectedIndex(key, 0);
 					index = 0;
 				}
 			}else if(key.equalsIgnoreCase("var-player")){
 				if(index > vpList.getItemCount()){
-					setSelectedIndex(key, 0);
+					config.setSelectedIndex(key, 0);
 					index = 0;
 				}
 			}else if(key.equalsIgnoreCase("var-world")){
 				if(index > vwList.getItemCount()){
-					setSelectedIndex(key, 0);
+					config.setSelectedIndex(key, 0);
 					index = 0;
 				}
 			}
 			return index;
 		} catch (NumberFormatException e) {
-			setSelectedIndex(key, 0);
+			config.setSelectedIndex(key, 0);
 			return 0;
 		}
-	}
-	
-	private void setSelectedIndex(String key, int index){
-		props.setProperty("last-selected-" + key, index + "");
-		PropertiesUtils.saveProperties(props, propsFile, "MacroHelper GeneralHelp options");
 	}
 	
 	private Object[] getData(String file){
@@ -286,20 +265,22 @@ public class PanelGeneralHelp extends JPanel implements ActionListener {
 		list.add(new GeneralHelpObject(events.getModel(), eventList, "/events.txt", "choice", 1));
 		list.add(new GeneralHelpObject(parameters.getModel(), parameterList, "/parameters.txt", "choice", 2));
 		list.add(new GeneralHelpObject(statements.getModel(), statementList, "/statements.txt", "choice", 3));
-		list.add(new GeneralHelpObject(vGeneral.getModel(), vgList, "/vgeneral.txt", "var-choice", 0, vGeneral, vInput, vPlayer, vWorld));
-		list.add(new GeneralHelpObject(vInput.getModel(), viList, "/vinput.txt", "var-choice", 1, vGeneral, vInput, vPlayer, vWorld));
-		list.add(new GeneralHelpObject(vPlayer.getModel(), vpList, "/vplayer.txt", "var-choice", 2, vGeneral, vInput, vPlayer, vWorld));
-		list.add(new GeneralHelpObject(vWorld.getModel(), vwList, "/vworld.txt", "var-choice", 3, vGeneral, vInput, vPlayer, vWorld));
+		list.add(new GeneralHelpObject(vEvent.getModel(), veList, "/vevent.txt", "var-choice", 0, vGeneral, vEvent, vInput, vPlayer, vWorld));
+		list.add(new GeneralHelpObject(vGeneral.getModel(), vgList, "/vgeneral.txt", "var-choice", 1, vGeneral, vEvent, vInput, vPlayer, vWorld));
+		list.add(new GeneralHelpObject(vInput.getModel(), viList, "/vinput.txt", "var-choice", 2, vGeneral, vEvent, vInput, vPlayer, vWorld));
+		list.add(new GeneralHelpObject(vPlayer.getModel(), vpList, "/vplayer.txt", "var-choice", 3, vGeneral, vEvent, vInput, vPlayer, vWorld));
+		list.add(new GeneralHelpObject(vWorld.getModel(), vwList, "/vworld.txt", "var-choice", 4, vGeneral, vEvent, vInput, vPlayer, vWorld));
 		if(source instanceof ButtonModel){
 			ButtonModel model = (ButtonModel) source;
 			if(model == controlFlow.getModel()){
-				setHelpText("/blocks.txt");
+				InputStream is = getClass().getResourceAsStream(MacroHelper.RES_FOLDER + "blocks.txt");
+				helpTextArea.setText(StringUtils.getContents(is));
 				helpTextArea.setCaretPosition(0);
 				disableComponents();
-				setSelectedIndex("choice", 0);
+				config.setSelectedIndex("choice", 0);
 			}else if(model == variables.getModel()){
 				setEnabledComponents(vGeneral, vInput, vPlayer, vWorld);
-				setSelectedIndex("choice", 4);
+				config.setSelectedIndex("choice", 4);
 				event(vGroup.getSelection());
 			}else{
 				for(GeneralHelpObject o : list){
@@ -307,32 +288,35 @@ public class PanelGeneralHelp extends JPanel implements ActionListener {
 						setHelpText(o.getTextFile(), o.getComboBox());
 						disableComponents();
 						o.setComponentsEnabled();
-						setSelectedIndex(o.getConfigKey(), o.getIndex());
+						config.setSelectedIndex(o.getConfigKey(), o.getIndex());
 						break;
 					}
 				}
 			}
 		}else if(source == eventList){
 			setHelpText("/events.txt", eventList);
-			setSelectedIndex("event", eventList.getSelectedIndex());
+			config.setSelectedIndex("event", eventList.getSelectedIndex());
 		}else if(source == parameterList){
 			setHelpText("/parameters.txt", parameterList);
-			setSelectedIndex("parameter", parameterList.getSelectedIndex());
+			config.setSelectedIndex("parameter", parameterList.getSelectedIndex());
 		}else if(source == statementList){
 			setHelpText("/statements.txt", statementList);
-			setSelectedIndex("statement", statementList.getSelectedIndex());
+			config.setSelectedIndex("statement", statementList.getSelectedIndex());
+		}else if(source == veList){
+			setHelpText("/vevent.txt", veList);
+			config.setSelectedIndex("var-event", veList.getSelectedIndex());
 		}else if(source == vgList){
 			setHelpText("/vgeneral.txt", vgList);
-			setSelectedIndex("var-general", vgList.getSelectedIndex());
+			config.setSelectedIndex("var-general", vgList.getSelectedIndex());
 		}else if(source == viList){
 			setHelpText("/vinput.txt", viList);
-			setSelectedIndex("var-input", viList.getSelectedIndex());
+			config.setSelectedIndex("var-input", viList.getSelectedIndex());
 		}else if(source == vpList){
 			setHelpText("/vplayer.txt", vpList);
-			setSelectedIndex("var-player", vpList.getSelectedIndex());
+			config.setSelectedIndex("var-player", vpList.getSelectedIndex());
 		}else if(source == vwList){
 			setHelpText("/vworld.txt", vwList);
-			setSelectedIndex("var-world", vwList.getSelectedIndex());
+			config.setSelectedIndex("var-world", vwList.getSelectedIndex());
 		}
 	}
 	
@@ -342,20 +326,12 @@ public class PanelGeneralHelp extends JPanel implements ActionListener {
 		helpTextArea.setText(p.getProperty((comboBox.getSelectedItem() + "").replaceAll(" ", "-").replaceAll(":", "'")));
 	}
 	
-	private void setHelpText(String file){
-		String resFolder = "/com/kill3rtaco/macrohelper/res";
-		Scanner x = new Scanner(getClass().getResourceAsStream(resFolder + file));
-		String string = "";
-		while(x.hasNextLine()){
-			string += x.nextLine() + "\n";
-		}
-		helpTextArea.setText(string);
-	}
-	
 	private void disableComponents(){
 		statementList.setEnabled(false);
 		vGeneral.setEnabled(false);
 		vgList.setEnabled(false);
+		vEvent.setEnabled(false);
+		veList.setEnabled(false);
 		vInput.setEnabled(false);
 		viList.setEnabled(false);
 		vPlayer.setEnabled(false);

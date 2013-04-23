@@ -1,0 +1,6 @@
+JOINEDPLAYER=The player that just joined. Used with onPlayerJoined
+OLDINVSLOT=The previously selected inventory slot. Used with onInventorySlotChange
+PICKUPID=The id of the item that was just picked up
+PICKUPITEM=The name of the item that was just picked up
+PICKUPAMOUNT=The amount of the item that was just picked up
+GUI=The class name of the current GUI; "NONE" if there isn't one

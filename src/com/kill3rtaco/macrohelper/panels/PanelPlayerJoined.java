@@ -2,11 +2,7 @@ package com.kill3rtaco.macrohelper.panels;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Properties;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -21,42 +17,28 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import com.kill3rtaco.macrohelper.MacroHelper;
-import com.kill3rtaco.macrohelper.util.PropertiesUtils;
+import com.kill3rtaco.macrohelper.config.PlayerJoinedConfig;
 import com.kill3rtaco.macrohelper.writer.PlayerJoinWriter;
 
 public class PanelPlayerJoined extends JPanel implements ActionListener, DocumentListener, ListSelectionListener {
 
 	private static final long serialVersionUID = -1241939689577548026L;
-	private File propsFile;
-	private Properties props;
 	private JButton bAddPlayer, bDeletePlayer, bSaveMessage, bWriteMacro;
 	private JTextField nameTb, messageTbLeft, messageTbRight;
 	private PanelPreview previewLeft, previewRight;
 	private JList playerList;
+	private PlayerJoinedConfig config;
 
 	public PanelPlayerJoined() {
-		 propsFile = MacroHelper.PLAYERJOIN_PROPERTIES;
-		 try {
-			 if(!propsFile.exists())
-				 propsFile.getParentFile().mkdirs();
-			 propsFile.createNewFile();
-			 props =  PropertiesUtils.reloadProperties(propsFile);
-			 if(props.getProperty("join-string-format") == null)
-			 props.setProperty("join-string-format", "&2+ &5%JOINEDPLAYER% &ejoined the game.");
-			 if(props.getProperty("log-every-player") == null)
-			 props.setProperty("log-every-player", "false");
-			 PropertiesUtils.saveProperties(props, propsFile, "MacroHelper Options for onPlayerJoined");
-		 } catch (IOException e) {
-			 e.printStackTrace();
-		 }
-		 setLayout(null);
-		 makePanel();
+		config = new PlayerJoinedConfig();
+		setLayout(null);
+		makePanel();
 	}
 	
 	private void makePanel(){
 		JPanel addPlayer = new JPanel();
 		addPlayer.setLayout(null);
-		addPlayer.setBounds(5, 5, 425, 440);
+		addPlayer.setBounds(5, 5, 425, MacroHelper.HEIGHT - MacroHelper.TOP_MARGIN - 275);
 		addPlayer.setBorder(BorderFactory.createTitledBorder("Add player"));
 		add(addPlayer);
 		
@@ -71,7 +53,7 @@ public class PanelPlayerJoined extends JPanel implements ActionListener, Documen
 		JLabel messageLabel = new JLabel("Message:");
 		messageLabel.setBounds(nameLabel.getX(), nameLabel.getY() + nameLabel.getHeight() + 5, 100, 20);
 		addPlayer.add(messageLabel);
-		messageTbLeft = new JTextField(props.getProperty("join-string-format"));
+		messageTbLeft = new JTextField(config.getDefaultJoinString());
 		messageTbLeft.setBounds(nameTb.getX(), messageLabel.getY() + 1, nameTb.getWidth(), nameTb.getHeight());
 		messageTbLeft.getDocument().addDocumentListener(this);
 		messageTbLeft.addActionListener(this);
@@ -87,7 +69,7 @@ public class PanelPlayerJoined extends JPanel implements ActionListener, Documen
 		
 		JPanel addedPlayers = new JPanel();
 		addedPlayers.setLayout(null);
-		addedPlayers.setBounds(addPlayer.getX() + addPlayer.getWidth() + 5, 5, 425, 440);
+		addedPlayers.setBounds(addPlayer.getX() + addPlayer.getWidth() + 5, 5, 425, MacroHelper.HEIGHT - MacroHelper.TOP_MARGIN - 5);
 		addedPlayers.setBorder(BorderFactory.createTitledBorder("Players"));
 		add(addedPlayers);
 		int offset = (addedPlayers.getWidth() - nameTb.getWidth()) / 2;
@@ -128,10 +110,7 @@ public class PanelPlayerJoined extends JPanel implements ActionListener, Documen
 	}
 	
 	private void updateList(){
-		ArrayList<String> list = new ArrayList<String>(props.stringPropertyNames());
-		list.remove("join-string-format");
-		list.remove("log-every-player");
-		Collections.sort(list);
+		ArrayList<String> list = config.getPlayerList();
 		String[] data = new String[list.size()];
 		int count = 0;
 		for(String s : list){
@@ -143,20 +122,16 @@ public class PanelPlayerJoined extends JPanel implements ActionListener, Documen
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		if(event.getSource() == bAddPlayer || event.getSource() == nameTb || event.getSource() == messageTbLeft){
-			props.setProperty(nameTb.getText(), messageTbLeft.getText());
+			config.setString(nameTb.getText(), messageTbLeft.getText());
 			updateList();
-			PropertiesUtils.saveProperties(props, propsFile, "MacroHelper Options for onPlayerJoined");
 		}else if(event.getSource() == bDeletePlayer){
-			props.remove(playerList.getSelectedValue());
-			PropertiesUtils.saveProperties(props, propsFile, "MacroHelper Options for onPlayerJoined");
+			config.removePlayer(playerList.getSelectedValue() + "");
 			updateList();
 		}else if(event.getSource() == bSaveMessage){
 			bSaveMessage.setEnabled(false);
-			props.setProperty(playerList.getSelectedValue() + "", messageTbRight.getText());
-			PropertiesUtils.saveProperties(props, propsFile, "MacroHelper Options for onPlayerJoined");
+			config.setString(playerList.getSelectedValue() + "", messageTbRight.getText());
 		}else if(event.getSource() == bWriteMacro){
-			props =  PropertiesUtils.reloadProperties(propsFile);
-			new PlayerJoinWriter(props).write();
+			new PlayerJoinWriter(config.getProps()).write();
 			
 		}
 	}
@@ -213,7 +188,7 @@ public class PanelPlayerJoined extends JPanel implements ActionListener, Documen
 		if(event.getSource() == playerList){
 			if(playerList.getSelectedValue() != null){
 				String name = playerList.getSelectedValue() + "";
-				messageTbRight.setText(props.getProperty(name));
+				messageTbRight.setText(config.getString(name));
 				previewRight.update(messageTbRight.getText(), "%JOINEDPLAYER%", name);
 				bSaveMessage.setEnabled(false);
 				bDeletePlayer.setEnabled(true);

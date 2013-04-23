@@ -2,12 +2,13 @@ package com.kill3rtaco.macrohelper;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-
 import com.kill3rtaco.macrohelper.options.FrameOptions;
+import com.kill3rtaco.util.GuiUtils;
 
 public class MacroHelperMenu extends JMenuBar implements ActionListener {
 
@@ -18,6 +19,7 @@ public class MacroHelperMenu extends JMenuBar implements ActionListener {
 		JMenu main = new JMenu("MacroHelper");
 		add(main);
 		options = new JMenuItem("Options...");
+		options.setAccelerator(GuiUtils.getMenuKeyStroke(KeyEvent.VK_O));
 		options.addActionListener(this);
 		main.add(options);
 		main.addSeparator();

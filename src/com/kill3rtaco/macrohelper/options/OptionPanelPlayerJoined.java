@@ -2,10 +2,9 @@ package com.kill3rtaco.macrohelper.options;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.Properties;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
@@ -14,7 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import com.kill3rtaco.macrohelper.MacroHelper;
-import com.kill3rtaco.macrohelper.util.PropertiesUtils;
+import com.kill3rtaco.util.PropertiesUtils;
 
 public class OptionPanelPlayerJoined extends JPanel implements ActionListener {
 
@@ -27,28 +26,28 @@ public class OptionPanelPlayerJoined extends JPanel implements ActionListener {
 
 	public OptionPanelPlayerJoined(JFrame parent) {
 		this.parent = parent;
-		try {
-			props = new Properties();
-			props.load(new FileInputStream(MacroHelper.PLAYERJOIN_PROPERTIES));
-		 } catch (IOException e) {
-			e.printStackTrace();
-		 }
-		 makePanel();
+		props = PropertiesUtils.reloadProperties(MacroHelper.PLAYERJOIN_PROPERTIES);
+		makePanel();
 	}
 	
 	private void makePanel(){
 		setLayout(null);
+		JPanel generalPanel = new JPanel();
+		generalPanel.setBounds(5, 5, FrameOptions.WIDTH - 15, 75);
+		generalPanel.setBorder(BorderFactory.createTitledBorder("General"));
+		generalPanel.setLayout(null);
+		add(generalPanel);
 		JLabel djsLabel = new JLabel("Default onPlayerJoin message:");
-		djsLabel.setBounds(5,  5, 220, 20);
-		add(djsLabel);
+		djsLabel.setBounds(10,  20, 220, 20);
+		generalPanel.add(djsLabel);
 		djsMessage = new JTextField(props.getProperty("join-string-format"));
 		djsMessage.setBounds(djsLabel.getX() + djsLabel.getWidth() + 5, djsLabel.getY() + 1, 300, 20);
-		add(djsMessage);
+		generalPanel.add(djsMessage);
 		logDefault = new JCheckBox("Notify me when any player joins the server", Boolean.parseBoolean(props.getProperty("log-every-player")));
 		logDefault.setBounds(djsLabel.getX(), djsLabel.getY() + djsLabel.getHeight() + 5, 330, 20);
-		add(logDefault);
+		generalPanel.add(logDefault);
 		saveButton = new JButton("Save");
-		saveButton.setBounds((545 - 155) / 2, logDefault.getY() + logDefault.getHeight() + 135, 75, 25);
+		saveButton.setBounds((FrameOptions.WIDTH - 155) / 2, FrameOptions.HEIGHT - FrameOptions.TOP_MARGIN - 25, 75, 25);
 		saveButton.addActionListener(this);
 		add(saveButton);
 		closeButton = new JButton("Close");
